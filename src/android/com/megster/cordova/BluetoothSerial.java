@@ -91,11 +91,28 @@ public class BluetoothSerial extends CordovaPlugin {
 
     private static final int CHECK_PERMISSIONS_REQ_CODE = 2;
 
+    private final ArrayList<String> permissions = new ArrayList<>();
+
+    public BluetoothSerial() {
+        // Set up required permissions
+        setupPermissionList();
+    }
+
+    private void setupPermissionList() {
+
+        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions.add(Manifest.permission.BLUETOOTH_SCAN);
+            permissions.add(Manifest.permission.BLUETOOTH_CONNECT);
+        }
+
+    };
+
     @SuppressLint("MissingPermission")
     @Override
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-
-        ArrayList<String> permissions = new ArrayList<>();
 
         LOG.d(TAG, "action = " + action);
 
@@ -108,15 +125,6 @@ public class BluetoothSerial extends CordovaPlugin {
         }
 
         boolean validAction = true;
-
-        // Set up required permissions
-        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            permissions.add(Manifest.permission.BLUETOOTH_SCAN);
-            permissions.add(Manifest.permission.BLUETOOTH_CONNECT);
-        }
 
         if (action.equals(LIST)) {
 
@@ -171,7 +179,8 @@ public class BluetoothSerial extends CordovaPlugin {
 
             delimiter = null;
 
-            // send no result, so Cordova won't hold onto the data available callback anymore
+            // send no result, so Cordova won't hold onto the data available callback
+            // anymore
             PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
             dataAvailableCallback.sendPluginResult(result);
             dataAvailableCallback = null;
@@ -227,11 +236,11 @@ public class BluetoothSerial extends CordovaPlugin {
 
         } else if (action.equals(DISCOVER_UNPAIRED)) {
 
-            if (hasPermission(permissions)) {
+            if (hasPermission()) {
                 discoverUnpairedDevices(callbackContext);
             } else {
                 permissionCallback = callbackContext;
-                requestPermissions(permissions, CHECK_PERMISSIONS_REQ_CODE);
+                requestPermissions(CHECK_PERMISSIONS_REQ_CODE);
             }
 
         } else if (action.equals(SET_DEVICE_DISCOVERED_LISTENER)) {
@@ -246,12 +255,13 @@ public class BluetoothSerial extends CordovaPlugin {
 
             String newName = args.getString(0);
 
-            if (hasPermission(permissions)) {
+            if (hasPermission()) {
                 bluetoothAdapter.setName(newName);
                 callbackContext.success();
             } else {
                 permissionCallback = callbackContext;
-                requestPermissions(permissions, CHECK_PERMISSIONS_REQ_CODE);
+                requestPermissions(CHECK_PERMISSIONS_REQ_CODE);
+                requestPermissions(CHECK_PERMISSIONS_REQ_CODE);
             }
 
         } else if (action.equals(SET_DISCOVERABLE)) {
@@ -321,7 +331,7 @@ public class BluetoothSerial extends CordovaPlugin {
                 if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     try {
-                    	JSONObject o = deviceToJSON(device);
+                        JSONObject o = deviceToJSON(device);
                         unpairedDevices.put(o);
                         if (ddc != null) {
                             PluginResult res = new PluginResult(PluginResult.Status.OK, o);
@@ -379,25 +389,26 @@ public class BluetoothSerial extends CordovaPlugin {
     // Consider replacing with normal callbacks
     private final Handler mHandler = new Handler() {
 
-         public void handleMessage(Message msg) {
-             switch (msg.what) {
-                 case MESSAGE_READ:
-                    buffer.append((String)msg.obj);
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MESSAGE_READ:
+                    buffer.append((String) msg.obj);
 
                     if (dataAvailableCallback != null) {
                         sendDataToSubscriber();
                     }
 
                     break;
-                 case MESSAGE_READ_RAW:
+                case MESSAGE_READ_RAW:
                     if (rawDataAvailableCallback != null) {
                         byte[] bytes = (byte[]) msg.obj;
                         sendRawDataToSubscriber(bytes);
                     }
                     break;
-                 case MESSAGE_STATE_CHANGE:
+                case MESSAGE_STATE_CHANGE:
 
-                    if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    if (D)
+                        Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
                         case BluetoothSerialService.STATE_CONNECTED:
                             Log.i(TAG, "BluetoothSerialService.STATE_CONNECTED");
@@ -415,9 +426,9 @@ public class BluetoothSerial extends CordovaPlugin {
                     }
                     break;
                 case MESSAGE_WRITE:
-                    //  byte[] writeBuf = (byte[]) msg.obj;
-                    //  String writeMessage = new String(writeBuf);
-                    //  Log.i(TAG, "Wrote: " + writeMessage);
+                    // byte[] writeBuf = (byte[]) msg.obj;
+                    // String writeMessage = new String(writeBuf);
+                    // Log.i(TAG, "Wrote: " + writeMessage);
                     break;
                 case MESSAGE_DEVICE_NAME:
                     Log.i(TAG, msg.getData().getString(DEVICE_NAME));
@@ -426,8 +437,8 @@ public class BluetoothSerial extends CordovaPlugin {
                     String message = msg.getData().getString(TOAST);
                     notifyConnectionLost(message);
                     break;
-             }
-         }
+            }
+        }
     };
 
     private void notifyConnectionLost(String error) {
@@ -487,20 +498,19 @@ public class BluetoothSerial extends CordovaPlugin {
 
     @Override
     public void onRequestPermissionResult(int requestCode, String[] permissions,
-                                          int[] grantResults) throws JSONException {
+            int[] grantResults) throws JSONException {
 
-        for(int result:grantResults) {
-            if(result == PackageManager.PERMISSION_DENIED) {
+        for (int result : grantResults) {
+            if (result == PackageManager.PERMISSION_DENIED) {
                 LOG.d(TAG, "User *rejected* location permission");
                 this.permissionCallback.sendPluginResult(new PluginResult(
                         PluginResult.Status.ERROR,
-                        "Location permission is required to discover unpaired devices.")
-                    );
+                        "Location permission is required to discover unpaired devices."));
                 return;
             }
         }
 
-        switch(requestCode) {
+        switch (requestCode) {
             case CHECK_PERMISSIONS_REQ_CODE:
                 LOG.d(TAG, "User granted location permission");
                 discoverUnpairedDevices(permissionCallback);
@@ -508,7 +518,7 @@ public class BluetoothSerial extends CordovaPlugin {
         }
     }
 
-    public boolean hasPermission(ArrayList<String> permissions) {
+    public boolean hasPermission() {
 
         String[] permissionList = permissions.toArray(new String[0]);
 
@@ -520,7 +530,7 @@ public class BluetoothSerial extends CordovaPlugin {
         return true;
     }
 
-    public void requestPermissions(ArrayList<String> permissions, int requestCode) {
+    public void requestPermissions(int requestCode) {
 
         String[] permissionList = permissions.toArray(new String[0]);
         PermissionHelper.requestPermissions(this, requestCode, permissionList);
