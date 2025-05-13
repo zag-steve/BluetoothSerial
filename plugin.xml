@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-bluetooth-serial" version="0.4.8">
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-bluetooth-serial"
+    version="0.4.8">
 
     <name>Bluetooth Serial</name>
     <description>Bluetooth Serial Communication Plugin</description>
@@ -20,14 +22,18 @@
             </feature>
         </config-file>
 
-        <source-file src="src/android/com/megster/cordova/BluetoothSerial.java" target-dir="src/com/megster/cordova" />
-        <source-file src="src/android/com/megster/cordova/BluetoothSerialService.java" target-dir="src/com/megster/cordova" />
+        <source-file src="src/android/com/megster/cordova/BluetoothSerial.java"
+            target-dir="src/com/megster/cordova" />
+        <source-file src="src/android/com/megster/cordova/BluetoothSerialService.java"
+            target-dir="src/com/megster/cordova" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.BLUETOOTH" />
             <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+            <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
         </config-file>
 
     </platform>
