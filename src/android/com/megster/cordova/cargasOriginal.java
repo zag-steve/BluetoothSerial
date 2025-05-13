@@ -23,7 +23,6 @@ import org.apache.cordova.LOG;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.apache.cordova.PermissionHelper;
 
 import java.util.Set;
 import java.util.HashMap;
@@ -90,12 +89,11 @@ public class BluetoothSerial extends CordovaPlugin {
 
     // Android 23 requires user to explicitly grant permission for location to discover unpaired
     private static final String ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    private static final String ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String BLUETOOTH_CONNECT = Manifest.permission.BLUETOOTH_CONNECT;
     private static final String BLUETOOTH_SCAN = Manifest.permission.BLUETOOTH_SCAN;
-    private static String [] permissions = { ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION, BLUETOOTH_CONNECT, BLUETOOTH_SCAN };
     private static int REQUEST_CODE = 2;// leaving this static although I'm assuming it's not necessary even if we have to instances of this plugin
     private HashMap<Integer,CordovaAction> pendingActions = new HashMap<Integer, CordovaAction>();
+
 
     @Override
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
@@ -509,20 +507,6 @@ public class BluetoothSerial extends CordovaPlugin {
                 execute(action.action, action.args, action.callbackContext);
             }
         }
-    }
-
-    public boolean hasPermission() {
-        for (String p : permissions) {
-            if (!PermissionHelper.hasPermission(this, p)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public void requestPermissions(int requestCode)
-    {
-        PermissionHelper.requestPermissions(this, requestCode, permissions);
     }
 
     private class CordovaAction {
