@@ -126,6 +126,11 @@ public class BluetoothSerial extends CordovaPlugin {
 
         boolean validAction = true;
 
+        if (!hasPermission())  {
+            permissionCallback = callbackContext;
+            requestPermissions(CHECK_PERMISSIONS_REQ_CODE);
+        }
+
         if (action.equals(LIST)) {
 
             listBondedDevices(callbackContext);
