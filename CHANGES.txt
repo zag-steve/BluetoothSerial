@@ -1,7 +1,10 @@
-= 0.x.x =
-Add hc02 Bluetooth BLE support #359
+= 0.4.10 =
+Check for bluetooth permissions at point of action trigger
 
-= 0.4.8 +
+= 0.4.9 =
+Update permissions for SDK31+
+
+= 0.4.8 =
 Update permissions for "android.permission.ACCESS_FINE_LOCATION" as required by Android API 29
 
 = 0.4.7 =

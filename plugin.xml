@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-bluetooth-serial" version="0.4.8">
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-bluetooth-serial" version="0.4.10">
 
     <name>Bluetooth Serial</name>
     <description>Bluetooth Serial Communication Plugin</description>
@@ -28,6 +29,8 @@
             <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+            <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
         </config-file>
 
     </platform>
